@@ -1,6 +1,6 @@
-import {endpoint} from "../../../constants/index";
+import {endpoint,endpointlocal} from "../../../constants/index";
 import api from "../../drivers/index";
-const FilmEndpoint = `${endpoint}/film`;
+const FilmEndpoint = `${endpointlocal}/film`;
 
 const FilmApi = {
     Film: {
@@ -9,6 +9,7 @@ const FilmApi = {
       create: async ({ params }) => await api.post(`${FilmEndpoint}`, params),
       update: async ({ id, params }) => await api.put(`${FilmEndpoint}/${id}`, params),
       delete: async (id) => await api.delete(`${FilmEndpoint}/${id}`),
+      getTypeFilm: async (id) => await api.delete(`${FilmEndpoint}/${id}/type`),
     }
   };
   export default FilmApi;

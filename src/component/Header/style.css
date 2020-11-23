@@ -2,6 +2,9 @@
     background-color:rgb(95, 151, 255);
     font-weight: 600;
     margin-bottom: 20px;
+    padding-top: 15px;
+/* position: fixed;
+z-index: 10; */
 }
 .hd_menu_left{
     color: white;

@@ -48,7 +48,7 @@ code {
 
 @media (min-width: 1200px) {
   .container {
-    max-width: 1140px;
+    max-width: 95%;
   }
 }
 
@@ -334,3 +334,14 @@ code {
   flex: 0 0 100%;
   max-width: 100%;
 }
+
+.col_left{
+  padding:0 5px;
+}
+
+.avatar-uploader > .ant-upload {
+  width: 100px;
+  height: 100px;
+}
+
+@import '~antd/dist/antd.css';

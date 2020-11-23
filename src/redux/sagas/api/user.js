@@ -1,6 +1,6 @@
-import {endpoint} from "../../../constants/index";
+import {endpoint,endpointlocal} from "../../../constants/index";
 import api from "../../drivers/index";
-const UserEndpoint = `${endpoint}/nguoidung`;
+const UserEndpoint = `${endpointlocal}/user`;
 
 const UserApi = {
     User: {
@@ -9,6 +9,11 @@ const UserApi = {
       create: async ({ params }) => await api.post(`${UserEndpoint}`, params),
       update: async ({ id, params }) => await api.put(`${UserEndpoint}/${id}`, params),
       delete: async (id) => await api.delete(`${UserEndpoint}/${id}`),
+    },
+    Auth:{
+      signin: async (params) => await api.post(`${UserEndpoint}/signin`,params),
+      signup: async (params) => await api.post(`${UserEndpoint}/signup`,params),
+      authGoogle: async (params) => await api.post(`${UserEndpoint}/auth/google`,params),
     }
   };
   export default UserApi;

@@ -3,7 +3,7 @@ import { get } from "lodash";
 
 const getState = (state) => get(state, "film");
 
-const getList = createSelector(getState, (state) => get(state, "list", []));
+const getList = createSelector(getState, (state) => get(state, "listFilm", []));
 
 
 const getMetadata = createSelector(getState, (state) =>

@@ -57,8 +57,7 @@ export default function (state = init, action) {
       return {
         ...state,
         loading: false,
-        listFilm: get(action, "payload.data.data", []),
-        metadata: omit(get(action, "payload.data"), ["data"]),
+        listFilm: get(action, "payload", []),
         apiResultGetList: omit(get(action, "payload"), ["data"]),
       };
 

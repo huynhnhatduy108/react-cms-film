@@ -10,12 +10,12 @@ function* handleGetList({ payload }) {
     try {
       const result = yield call(FilmApi.Film.getList, payload);
       const data = get(result, "data");
-      if (get(data, "code") !== 200) {
+      if (get(result, "status") !== 200) {
         throw data;
       }
       yield put(FilmActions.onGetListSuccess(data));
     } catch (error) {
-      message.error(get(error, "msg") || get(error, "message"));
+      message.error("Get List Error", error);
       yield put(FilmActions.onGetListError(error));
     }
   }
@@ -25,7 +25,7 @@ function* handleGetList({ payload }) {
     try {
       const result = yield call(FilmApi.Film.getDetail, id);
       const data = get(result, "data");
-      if (data.code !== 200) throw data;
+      if (get(result, "status") !== 200) throw data;
       yield put(FilmActions.onGetDetailSuccess(data));
     } catch (error) {
       message.error(get(error, "msg") || get(error, "message"));
@@ -38,7 +38,7 @@ function* handleGetList({ payload }) {
     try {
       const result = yield call(FilmApi.Film.create, payload);
       const data = get(result, "data");
-      if (data.code !== 200) throw data;
+      if (get(result, "status") !== 200) throw data;
       message.success("Create Film success!");
       if (callback) {
         callback();
@@ -56,9 +56,8 @@ function* handleGetList({ payload }) {
   function* handleUpdate({ payload, filters, callback }) {
     try {
       const result = yield call(FilmApi.Film.update, payload);
-      const data = get(result, "data", {});
-      if (data.code !== 200) throw data;
-      console.log("update_Data_Success", data);
+      const data = get(result, "data", []);
+      if (get(result, "status") !== 200) throw data;
       message.success("Update Film success!");
       if (callback){ callback();};
       yield put(FilmActions.onUpdateSuccess(data));
@@ -75,7 +74,7 @@ function* handleGetList({ payload }) {
     try {
       const result = yield call(FilmApi.Film.delete, id);
       const data = get(result, "data", {});
-      if (data.code !== 200) throw data;
+      if (get(result, "status") !== 200) throw data;
       message.success("Delete Film Success!");
       if (callback) {callback();};
       yield put(FilmActions.onDeleteSuccess(data));
