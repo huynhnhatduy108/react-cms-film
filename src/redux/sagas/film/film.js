@@ -15,7 +15,7 @@ function* handleGetList({ payload }) {
       }
       yield put(FilmActions.onGetListSuccess(data));
     } catch (error) {
-      message.error("Get List Error", error);
+      message.error("Get List Film Error", error);
       yield put(FilmActions.onGetListError(error));
     }
   }
@@ -34,17 +34,17 @@ function* handleGetList({ payload }) {
   }
 
   // Create
-  function* handleCreate({ payload, filters, callback }) {
+  function* handleCreate({ payload ,callback}) {
     try {
       const result = yield call(FilmApi.Film.create, payload);
       const data = get(result, "data");
-      if (get(result, "status") !== 200) throw data;
+      if (get(result, "status") !== 201) throw data;
       message.success("Create Film success!");
       if (callback) {
         callback();
       }
       yield put(FilmActions.onCreateSuccess(data));
-      yield put(FilmActions.onGetList(filters));
+      yield put(FilmActions.onGetList());
     } catch (error) {
       console.log(error);
       message.error(get(error, "msg", "Error when create Film!"));
@@ -53,15 +53,16 @@ function* handleGetList({ payload }) {
   }
   
   // Update
-  function* handleUpdate({ payload, filters, callback }) {
+  function* handleUpdate({ payload, callback }) {
     try {
       const result = yield call(FilmApi.Film.update, payload);
-      const data = get(result, "data", []);
+      console.log("result",result);
+      const data = get(result, "data");
       if (get(result, "status") !== 200) throw data;
       message.success("Update Film success!");
       if (callback){ callback();};
       yield put(FilmActions.onUpdateSuccess(data));
-      yield put(FilmActions.onGetList(filters));
+      yield put(FilmActions.onGetList());
     } catch (error) {
       console.log(error);
       message.error(get(error, "msg", "Error when Update Film"));
@@ -78,6 +79,7 @@ function* handleGetList({ payload }) {
       message.success("Delete Film Success!");
       if (callback) {callback();};
       yield put(FilmActions.onDeleteSuccess(data));
+      yield put(FilmActions.onGetList());
     } catch (error) {
       console.log(error);
       message.error(error, "msq", "Error when Delete Film!");

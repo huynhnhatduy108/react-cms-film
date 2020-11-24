@@ -14,13 +14,14 @@ import { get, omit } from "lodash";
 import { useDispatch, useSelector } from "react-redux";
 import FilmActions from "../../redux/actions/film/film";
 import FilmSelectors from "../../redux/selectors/film/film";
+import { parse } from "query-string";
 
 const layout = {
-  labelCol: { span: 5 },
-  wrapperCol: { span: 16 },
+  labelCol: { offset: 2,span: 10 },
+  wrapperCol: {  offset: 2,span: 20 },
 };
 const tailLayout = {
-  wrapperCol: { offset: 4, span: 18 },
+  wrapperCol: { offset: 4, span: 15 },
 };
 
 const getBase64 = (img, callback) => {
@@ -41,10 +42,32 @@ const beforeUpload = (file) => {
 };
 
 const FilmDetail = ({ id, onClose, openModal }) => {
+  const dispatch = useDispatch();
+
   const [form] = Form.useForm();
-  const [_id, setID] = useState(id);
-  const [image, setImage] = useState(null);
+  // const [idFilm, setIdFilm] = useState(id);
+  const [hidden, setHidden] = useState(false);
+  const [thumbnail, setThumbnail] = useState(null);
+  const [name, setName] = useState("");
+  const [image, setImage] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState();
+
   const [loading, setLoading] = useState(false);
+
+  const detail = useSelector(FilmSelectors.getDetail);
+  const filmDetail = get(detail, "film");
+  console.log("id", id);
+
+
+  useEffect(() => {
+    if (id) {
+      dispatch(FilmActions.onGetDetail(id));
+    }
+    return () => {
+      form.resetFields();
+    };
+  }, [id]);
 
   const onSummit = (value) => {
     console.log("value", value);
@@ -54,33 +77,68 @@ const FilmDetail = ({ id, onClose, openModal }) => {
     if (typeof openModal === "function") {
       openModal(onClose);
     }
+    form.resetFields();
+    // setHidden(true);
   };
 
-  const handleChange = (info) => {
-    if (info.file.status === "uploading") {
-      setLoading(true);
-      return;
+  const creatFilm = () => {
+    const params ={
+      name:name,
+      description:description,
+      price:price,
+      thumbnail:thumbnail,
     }
-    if (info.file.status === "done") {
-      // Get this url from response in real world.
-      getBase64(
-        info.file.originFileObj,
-        (imageUrl) => setImage(imageUrl),
-        setLoading(false)
-      );
-    }
+    dispatch(FilmActions.onCreate({params}));
+      form.resetFields();
   };
-  const uploadButton = (
-    <div>
-      {loading ? <LoadingOutlined /> : <PlusOutlined />}
-      <div style={{ marginTop: 8 }}>Upload</div>
-    </div>
-  );
+
+  const updateFilm = () => {
+    const params ={
+      name:name,
+      description:description,
+      price:price,
+      thumbnail:thumbnail,
+    }
+    if (id) {
+      dispatch(FilmActions.onUpdate({id,params}))
+    }
+    // let id ="5fbbb3dff3332b276cfdc08d";
+   
+  };
+
+  // Upload img
+
+  // const handleChange = (info) => {
+  //   if (info.file.status === "uploading") {
+  //     setLoading(true);
+  //     return;
+  //   }
+  //   if (info.file.status === "done") {
+  //     getBase64(
+  //       info.file.originFileObj,
+  //       (imageUrl) => setImage(imageUrl),
+  //       setLoading(false)
+  //     );
+  //   }
+  // };
+  // const uploadButton = (
+  //   <div>
+  //     {loading ? <LoadingOutlined /> : <PlusOutlined />}
+  //     <div style={{ marginTop: 8 }}>Upload</div>
+  //   </div>
+  // );
 
   return (
     <div className="film_detail">
-      <Card title={!id ? "Create Film" : "Film Detail & Update"}>
-        <Form form={form} {...layout} onFinish={onSummit}>
+      <Card title={!hidden ? "Create Film" : "Film Detail & Update"}>
+        <Form form={form}
+         {...layout} 
+         layout="vertical"
+         initialValues={{
+           ...filmDetail,
+         }}
+         onFinish={onSummit}
+         >
           <Form.Item
             label="Name"
             name="name"
@@ -91,7 +149,7 @@ const FilmDetail = ({ id, onClose, openModal }) => {
               },
             ]}
           >
-            <Input />
+            <Input onChange={(e) => setName(e.target.value)} />
           </Form.Item>
           <Form.Item
             label="Description"
@@ -103,7 +161,7 @@ const FilmDetail = ({ id, onClose, openModal }) => {
               },
             ]}
           >
-            <Input />
+            <Input onChange={(e) => setDescription(e.target.value)} />
           </Form.Item>
           <Form.Item
             label="Price"
@@ -115,9 +173,27 @@ const FilmDetail = ({ id, onClose, openModal }) => {
               },
             ]}
           >
-            <InputNumber min={0} style={{ width: "100%" }} />
+            <InputNumber
+              min={0}
+              style={{ width: "100%" }}
+              onChange={(e)=>setPrice(e)}
+            />
           </Form.Item>
           <Form.Item
+            label="Image URL"
+            name="thumbnail"
+            rules={[
+              {
+                required: true,
+                message: "Please input Image URL",
+              },
+            ]}
+          >
+            <Input
+              onChange={(e)=>setThumbnail(e.target.value)}
+            />
+          </Form.Item>
+          {/* <Form.Item 
             label="Image"
             name="image"
             rules={[
@@ -142,7 +218,7 @@ const FilmDetail = ({ id, onClose, openModal }) => {
                 uploadButton
               )}
             </Upload>
-          </Form.Item>
+          </Form.Item> */}
         </Form>
 
         <Form.Item {...tailLayout}>
@@ -150,8 +226,12 @@ const FilmDetail = ({ id, onClose, openModal }) => {
             <Button type="danger" onClick={closeModal}>
               Close
             </Button>
-            <Button type="default">Create</Button>
-            <Button type="primary">Update</Button>
+            <Button type="primary" hidden={false} onClick={creatFilm}>
+              Create
+            </Button>
+            <Button type="default" hidden={false} onClick={updateFilm}>
+              Update
+            </Button>
           </>
         </Form.Item>
       </Card>
