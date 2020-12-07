@@ -1,9 +1,9 @@
 import { createSelector } from "reselect";
 import { get } from "lodash";
 
-const getState = (state) => get(state, "typeFilm");
+const getState = (state) => get(state, "typefilm");
 
-const getList = createSelector(getState, (state) => get(state, "list", []));
+const getList = createSelector(getState, (state) => get(state, "listTypeFilm", []));
 
 
 const getMetadata = createSelector(getState, (state) =>

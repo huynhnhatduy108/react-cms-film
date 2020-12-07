@@ -5,60 +5,46 @@ import {
   Form,
   Input,
   Select,
-  Upload,
+  Option,
+  Image,
   message,
   InputNumber,
 } from "antd";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
-import { get, omit } from "lodash";
+import { get, cloneDeep } from "lodash";
 import { useDispatch, useSelector } from "react-redux";
 import FilmActions from "../../redux/actions/film/film";
 import FilmSelectors from "../../redux/selectors/film/film";
+import TypeFilmSelectors from "../../redux/selectors/type/type";
 import { parse } from "query-string";
 
 const layout = {
-  labelCol: { offset: 2,span: 10 },
-  wrapperCol: {  offset: 2,span: 20 },
+  labelCol: { offset: 2, span: 10 },
+  wrapperCol: { offset: 2, span: 20 },
 };
 const tailLayout = {
   wrapperCol: { offset: 4, span: 15 },
-};
-
-const getBase64 = (img, callback) => {
-  const reader = new FileReader();
-  reader.addEventListener("load", () => callback(reader.result));
-  reader.readAsDataURL(img);
-};
-const beforeUpload = (file) => {
-  const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
-  if (!isJpgOrPng) {
-    message.error("You can only upload JPG/PNG file!");
-  }
-  const isLt2M = file.size / 1024 / 1024 < 2;
-  if (!isLt2M) {
-    message.error("Image must smaller than 2MB!");
-  }
-  return isJpgOrPng && isLt2M;
 };
 
 const FilmDetail = ({ id, onClose, openModal }) => {
   const dispatch = useDispatch();
 
   const [form] = Form.useForm();
-  // const [idFilm, setIdFilm] = useState(id);
+  const [loading, setLoading] = useState(false);
   const [hidden, setHidden] = useState(false);
-  const [thumbnail, setThumbnail] = useState(null);
+
   const [name, setName] = useState("");
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState(null);
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState();
-
-  const [loading, setLoading] = useState(false);
+  const [types,setTypes] = useState();
 
   const detail = useSelector(FilmSelectors.getDetail);
+  const listTypeFilm = useSelector(TypeFilmSelectors.getList);
   const filmDetail = get(detail, "film");
-  console.log("id", id);
+  const listTypes = get(listTypeFilm, "types");
 
+  console.log("idfilm", id);
 
   useEffect(() => {
     if (id) {
@@ -69,76 +55,52 @@ const FilmDetail = ({ id, onClose, openModal }) => {
     };
   }, [id]);
 
-  const onSummit = (value) => {
-    console.log("value", value);
-  };
-
   const closeModal = () => {
+    // form.resetFields();
     if (typeof openModal === "function") {
       openModal(onClose);
     }
-    form.resetFields();
-    // setHidden(true);
   };
 
   const creatFilm = () => {
-    const params ={
-      name:name,
-      description:description,
-      price:price,
-      thumbnail:thumbnail,
-    }
-    dispatch(FilmActions.onCreate({params}));
-      form.resetFields();
+    const params = new FormData();
+    params.append("name", name);
+    params.append("description", description);
+    params.append("price", price);
+    params.append("image", image);
+    if(types){ types.map(type =>{
+      params.append("types",type);
+    }); } 
+    dispatch(FilmActions.onCreate(params));
+    form.resetFields();
+    setImage(null);
   };
 
   const updateFilm = () => {
-    const params ={
-      name:name,
-      description:description,
-      price:price,
-      thumbnail:thumbnail,
-    }
+    const params = new FormData();
+    params.append("name", name);
+    params.append("description", description);
+    params.append("price", price);
+    if(types){ types.map(type =>{
+      params.append("types",type);
+    }); }   
+    params.append("image", image);
     if (id) {
-      dispatch(FilmActions.onUpdate({id,params}))
+      dispatch(FilmActions.onUpdate({ id, params }));
     }
-    // let id ="5fbbb3dff3332b276cfdc08d";
-   
   };
-
-  // Upload img
-
-  // const handleChange = (info) => {
-  //   if (info.file.status === "uploading") {
-  //     setLoading(true);
-  //     return;
-  //   }
-  //   if (info.file.status === "done") {
-  //     getBase64(
-  //       info.file.originFileObj,
-  //       (imageUrl) => setImage(imageUrl),
-  //       setLoading(false)
-  //     );
-  //   }
-  // };
-  // const uploadButton = (
-  //   <div>
-  //     {loading ? <LoadingOutlined /> : <PlusOutlined />}
-  //     <div style={{ marginTop: 8 }}>Upload</div>
-  //   </div>
-  // );
 
   return (
     <div className="film_detail">
       <Card title={!hidden ? "Create Film" : "Film Detail & Update"}>
-        <Form form={form}
-         {...layout} 
-         layout="vertical"
-         initialValues={{
+        <Form
+          form={form}
+          {...layout}
+          layout="vertical"
+          initialValues={{
            ...filmDetail,
-         }}
-         onFinish={onSummit}
-         >
+          }}
+        >
           <Form.Item
             label="Name"
             name="name"
@@ -176,24 +138,31 @@ const FilmDetail = ({ id, onClose, openModal }) => {
             <InputNumber
               min={0}
               style={{ width: "100%" }}
-              onChange={(e)=>setPrice(e)}
+              onChange={(e) => setPrice(e)}
             />
           </Form.Item>
           <Form.Item
-            label="Image URL"
-            name="thumbnail"
+            label="Select Type"
+            name="types"
             rules={[
               {
                 required: true,
-                message: "Please input Image URL",
+                message: "Please choose type film!",
               },
             ]}
           >
-            <Input
-              onChange={(e)=>setThumbnail(e.target.value)}
-            />
+            <Select
+            mode="multiple"
+            style={{ width: "100%" }}
+            placeholder="Choose Type Film"
+            onChange ={e=>{setTypes(e)}}
+            >
+             {listTypes? listTypes.map(type =>{
+                return (<Select.Option key={type._id} value={type._id}>{type.name}</Select.Option>)
+              }):[]}
+            </Select>
           </Form.Item>
-          {/* <Form.Item 
+          <Form.Item
             label="Image"
             name="image"
             rules={[
@@ -203,22 +172,21 @@ const FilmDetail = ({ id, onClose, openModal }) => {
               },
             ]}
           >
-            <Upload
-              name="image"
-              listType="picture-card"
-              className="avatar-uploader"
-              showUploadList={false}
-              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-              beforeUpload={beforeUpload}
-              onChange={handleChange}
-            >
-              {image ? (
-                <img src={image} alt="avatar" style={{ width: "100%" }} />
-              ) : (
-                uploadButton
-              )}
-            </Upload>
-          </Form.Item> */}
+            <Input
+              type="file"
+              onChange={(e) => {
+                setImage(e.target.files[0]);
+              }}
+            />
+            {image ? (
+              <Image
+                width={130}
+                height={180}
+                style={{ marginTop: 10 }}
+                src={URL.createObjectURL(image)}
+              />
+            ) : null}
+          </Form.Item>
         </Form>
 
         <Form.Item {...tailLayout}>

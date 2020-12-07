@@ -12,8 +12,12 @@ import {
   Tag,
   Table,
 } from "antd";
-import ConfirmDeleteButton from "../../component/ConfirmDelete";
-import TypeFilmDetail from "../../component/TypeFilmDetail/TypeFilmDetail";
+import ConfirmDeleteButton from "../../container/ConfirmDelete";
+import TypeFilmDetail from "../../container/TypeFilmDetail/TypeFilmDetail";
+import TypeFilmSelectors from "../../redux/selectors/type/type";
+import TypeFilmActions from "../../redux/actions/type/typefilm";
+import FilmActions from "../../redux/actions/film/film";
+
 
 class TypeFilm extends Component {
   constructor(props) {
@@ -48,24 +52,30 @@ class TypeFilm extends Component {
 
   _handleDelete = (e, id) => {
     e.stopPropagation();
-    console.log("iddelete", id);
-    // this.props.onDelete({id});
+    this.props.onDelete({id});
   };
   
 
-  onSearch = (value) => {
+  onSearch = (e) => {
     this.setState({
       filter: {
-        keyword: value,
+        keyword: e.target.value,
       },
     });
   };
 
-  componentDidMount() {}
+  componentDidMount() {
+    this.props.onClearState();
+    this.props.onGetList();
+    this.props.onGetlistFilm();
+  }
 
   render() {
     const { onClose, openModal, id, filter } = this.state;
     const { keyword, sort } = filter;
+    const { listItems } = this.props;
+    var {types} =listItems;
+    // console.log("Types",types);
 
     var data = [
       {
@@ -85,7 +95,7 @@ class TypeFilm extends Component {
     ];
 
     if (keyword) {
-      data = data.filter((item) => {
+      types = types.filter((item) => {
         return item.name.toLowerCase().indexOf(keyword) !== -1;
       });
     }
@@ -98,6 +108,7 @@ class TypeFilm extends Component {
               openModal={(value) => {
                 this.setState({
                   openModal: value,
+                  id: null,
                 });
               }}
               onClose={onClose}
@@ -119,13 +130,13 @@ class TypeFilm extends Component {
                 </div>
                 <div className="col-6">
                   <Input.Search
-                    onSearch={this.onSearch}
+                    onChange={this.onSearch}
                     placeholder="input keywork"
                     enterButton
                   />
                 </div>
               </div>
-              <Card title={"Film Data"}>
+              <Card title={"Type Film Data"}>
                 <Table
                   rowKey={(i) => i._id}
                   columns={[
@@ -146,26 +157,6 @@ class TypeFilm extends Component {
                       key: "description",
                     },
                     {
-                      title: "Film",
-                      key: "films",
-                      dataIndex: "films",
-                      render: (films) => (
-                        <>
-                          {films.map((film) => {
-                            let color = film.length > 6 ? "geekblue" : "green";
-                            if (film === "loser") {
-                              color = "volcano";
-                            }
-                            return (
-                              <Tag color={color} key={film}>
-                                {film}
-                              </Tag>
-                            );
-                          })}
-                        </>
-                      ),
-                    },
-                    {
                       title: "Action",
                       key: "_id",
                       dataIndex: "_id",
@@ -184,7 +175,7 @@ class TypeFilm extends Component {
                       ),
                     },
                   ]}
-                  dataSource={data}
+                  dataSource={types}
                   pagination={{
                     pageSize:
                       parseInt(this.state.pagination.pageSize, 10) || 10,
@@ -200,19 +191,20 @@ class TypeFilm extends Component {
 }
 
 const mapStateToProps = (state) => {
-  // return {
-  //   filmState: FilmSelectors.getState(state),
-  //   listItems: FilmSelectors.getList(state),
-  //   metadata: FilmSelectors.getMetadata(state),
-  //   apiResultGetList: FilmSelectors.apiResultGetList(state),
-  // };
+  return {
+    filmState: TypeFilmSelectors.getState(state),
+    listItems: TypeFilmSelectors.getList(state),
+    metadata: TypeFilmSelectors.getMetadata(state),
+    apiResultGetList: TypeFilmSelectors.apiResultGetList(state),
+  };
 };
 
 const mapDispatchToProps = {
-  // onGetList: FilmActions.onGetList,
-  // onClearDetail: FilmActions.onClearDetail,
-  // onClearState: FilmActions.onClearState,
-  // onDelete: FilmActions.onDelete,
+  onGetList: TypeFilmActions.onGetList,
+  onClearDetail: TypeFilmActions.onClearDetail,
+  onClearState: TypeFilmActions.onClearState,
+  onDelete: TypeFilmActions.onDelete,
+  onGetlistFilm :FilmActions.onGetList,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(TypeFilm);

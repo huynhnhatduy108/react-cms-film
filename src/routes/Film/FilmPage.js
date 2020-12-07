@@ -17,6 +17,9 @@ import ConfirmDeleteButton from "../../container/ConfirmDelete";
 import FilmSelectors from "../../redux/selectors/film/film";
 import FilmActions from "../../redux/actions/film/film";
 import FilmDetail from "../../container/FilmDetail/FilmDetail";
+import TypeFilmActions from "../../redux/actions/type/typefilm";
+import TypeFilmSelectors from "../../redux/selectors/type/type";
+
 
 class FilmPage extends Component {
   constructor(props) {
@@ -40,7 +43,9 @@ class FilmPage extends Component {
   _openModal = () => {
     this.setState({
       openModal: !this.state.openModal,
+      id: null,
     });
+    
   };
 
   _onUpdate = (e, id) => {
@@ -56,22 +61,24 @@ class FilmPage extends Component {
     this.props.onDelete({id});
   };
 
-  onSearch =(value)=>{
+  onSearch = (e) => {
     this.setState({
-      filter:{ 
-        keyword:value
+      filter: {
+        keyword: e.target.value,
       },
     });
-  }
+  };
 
   componentDidMount() {
     this.props.onClearState();
     this.props.onGetList();
+    this.props.onGetlistTypeFilm();
   }
 
   render() {
-    const { listItems } = this.props;
+    const { listItems, listTypeFilm } = this.props;
     const { onClose, openModal, id, filter } = this.state;
+    const {types} = listTypeFilm;
     var { films } = listItems;
     const {keyword, sort} = filter;
 
@@ -146,6 +153,7 @@ class FilmPage extends Component {
               openModal={(value) => {
                 this.setState({
                   openModal: value,
+                  id: null,
                 });
               }}
               onClose={onClose}
@@ -166,7 +174,7 @@ class FilmPage extends Component {
               </div>
               <div className="col-6">
                 <Input.Search 
-                 onSearch={this.onSearch}
+                 onChange={this.onSearch}
                 placeholder="input keywork"
                 enterButton
                 />
@@ -193,8 +201,8 @@ class FilmPage extends Component {
                   },
                   {
                     title: "Image",
-                    dataIndex: "thumbnail",
-                    key: "thumbnail",
+                    dataIndex: "image",
+                    key: "image",
                     render: (image) => (
                       <img src={image} alt="" width={"100px"} />
                     ),
@@ -203,16 +211,19 @@ class FilmPage extends Component {
                     title: "Type",
                     key: "types",
                     dataIndex: "types",
-                    render: (types) => (
+                    render: (listtypes) => (
                       <>
-                        {types.map((type) => {
-                          let color = type.length > 5 ? "geekblue" : "green";
-                          if (type === "loser") {
-                            color = "volcano";
+                        {listtypes.map((type, index) => {
+                          let color = index %3 === 0 ? "geekblue" : index %2 === 0 ? "green":"volcano";
+                          let tagName;
+                          if(types){ 
+                            types.map((item)=>{
+                              if(item._id ===type) return tagName = item.name;
+                           })
                           }
                           return (
                             <Tag color={color} key={type}>
-                              {type}
+                              {tagName}
                             </Tag>
                           );
                         })}
@@ -257,6 +268,7 @@ const mapStateToProps = (state) => {
     listItems: FilmSelectors.getList(state),
     metadata: FilmSelectors.getMetadata(state),
     apiResultGetList: FilmSelectors.apiResultGetList(state),
+    listTypeFilm: TypeFilmSelectors.getList(state),
   };
 };
 
@@ -265,6 +277,8 @@ const mapDispatchToProps = {
   onClearDetail: FilmActions.onClearDetail,
   onClearState: FilmActions.onClearState,
   onDelete: FilmActions.onDelete,
+  onGetlistTypeFilm :TypeFilmActions.onGetList,
+
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(FilmPage);

@@ -68,11 +68,9 @@ export const FilmActionTypes = {
   });
   
   // ON CREAT 
-  const onCreate = ({ params, filters, callback }) => ({
+  const onCreate = (params) => ({
     type: FilmActionTypes.CREATE,
     payload: { params },
-    filters,
-    callback,
   });
   
   const onCreateSuccess = (payload) => ({

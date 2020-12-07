@@ -2,19 +2,17 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import {
   Button,
-  Result,
-  Skeleton,
-  Spin,
-  Card,
-  Form,
-  Input,
-  Select,
-  Pagination,
   Tag,
   Table,
+  Input,
+  Card,
 } from "antd";
-import ConfirmDeleteButton from "../../component/ConfirmDelete";
-import UserDetail from "../../component/UserDetail/UserDetail";
+import ConfirmDeleteButton from "../../container/ConfirmDelete";
+import UserDetail from "../../container/UserDetail/UserDetail";
+import UserSelectors from "../../redux/selectors/user/user";
+import UserActions from "../../redux/actions/user/user";
+import {userRole} from "../../constants";
+
 
 class UserPage extends Component {
   constructor(props) {
@@ -23,6 +21,7 @@ class UserPage extends Component {
       openModal: false,
       onClose: false,
       id: null,
+      detail:null,
       filter: {
         keyword: "",
         sort: 0,
@@ -43,30 +42,34 @@ class UserPage extends Component {
   _onUpdate = (id) => {
     this.setState({
       openModal: true,
+      id:id
     });
-    console.log("Update_id", id);
   };
 
   _handleDelete = (e, id) => {
     e.stopPropagation();
-    console.log("iddelete", id);
-    // this.props.onDelete({id});
+    this.props.onDelete({id});
   };
 
-  onSearch = (value) => {
+  onSearch = (e) => {
     this.setState({
       filter: {
-        keyword: value,
+        keyword: e.target.value,
       },
     });
   };
 
-  componentDidMount() {}
+  componentDidMount() {
+    this.props.onGetList();
+    this.props.onClearState();
+  }
 
   render() {
     const { listItems } = this.props;
     const { onClose, openModal, id, filter } = this.state;
     const { keyword, sort } = filter;
+    var {users} =listItems;
+    
 
     var data = [
       {
@@ -177,7 +180,7 @@ class UserPage extends Component {
     ];
 
     if (keyword) {
-      data = data.filter((item) => {
+      users = users.filter((item) => {
         return item.name.toLowerCase().indexOf(keyword) !== -1;
       });
     }
@@ -190,6 +193,7 @@ class UserPage extends Component {
               openModal={(value) => {
                 this.setState({
                   openModal: value,
+                  id:null
                 });
               }}
               onClose={onClose}
@@ -211,13 +215,13 @@ class UserPage extends Component {
                 </div>
                 <div className="col-6">
                   <Input.Search
-                    onSearch={this.onSearch}
+                    onChange={this.onSearch}
                     placeholder="input keywork"
                     enterButton
                   />
                 </div>
               </div>
-              <Card title={"Film Data"}>
+              <Card title={"User Data"}>
                 <Table
                   rowKey={(i) => i._id}
                   columns={[
@@ -240,7 +244,13 @@ class UserPage extends Component {
                       title: "Role",
                       key: "role",
                       dataIndex: "role",
-                      render: (role) => <Tag key={role}>{role}</Tag>,
+                      render: (role) =>{
+                        let tag;
+                        userRole.map(item =>{
+                          if(item.id===role) return tag = item
+                        })
+                        return <Tag key={role}>{tag.role}</Tag>;
+                      },
                     },
                     {
                       title: "Action",
@@ -261,7 +271,7 @@ class UserPage extends Component {
                       ),
                     },
                   ]}
-                  dataSource={data}
+                  dataSource={users}
                   pagination={{
                     pageSize:
                       parseInt(this.state.pagination.pageSize, 10) || 10,
@@ -277,19 +287,19 @@ class UserPage extends Component {
 }
 
 const mapStateToProps = (state) => {
-  // return {
-  //   filmState: FilmSelectors.getState(state),
-  //   listItems: FilmSelectors.getList(state),
-  //   metadata: FilmSelectors.getMetadata(state),
-  //   apiResultGetList: FilmSelectors.apiResultGetList(state),
-  // };
+  return {
+    filmState: UserSelectors.getState(state),
+    listItems: UserSelectors.getList(state),
+    metadata: UserSelectors.getMetadata(state),
+    apiResultGetList: UserSelectors.apiResultGetList(state),
+  };
 };
 
 const mapDispatchToProps = {
-  // onGetList: FilmActions.onGetList,
-  // onClearDetail: FilmActions.onClearDetail,
-  // onClearState: FilmActions.onClearState,
-  // onDelete: FilmActions.onDelete,
+  onGetList: UserActions.onGetList,
+  onClearDetail: UserActions.onClearDetail,
+  onClearState: UserActions.onClearState,
+  onDelete: UserActions.onDelete,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserPage);

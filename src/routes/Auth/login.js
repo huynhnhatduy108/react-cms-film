@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Footer from "./../../component/Footer/index";
+import Footer from "../../component/Footer/index";
 import {
   Button,
   Result,

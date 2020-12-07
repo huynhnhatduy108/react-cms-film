@@ -1,9 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Button,
-  Result,
-  Skeleton,
-  Spin,
   Card,
   Form,
   Input,
@@ -13,28 +10,58 @@ import {
 } from "antd";
 import { get, omit } from "lodash";
 import { useDispatch, useSelector } from "react-redux";
+import TypeFilmActions from "../../redux/actions/type/typefilm";
+import TypeFilmSelectors from "../../redux/selectors/film/film";
+import FilmSelectors from "../../redux/selectors/film/film";
+import { parse } from "query-string";
 
 const layout = {
-  labelCol: { span: 5 },
-  wrapperCol: { span: 16 },
+  labelCol: { offset: 2, span: 10 },
+  wrapperCol: { offset: 2, span: 20 },
 };
 const tailLayout = {
   wrapperCol: { offset: 4, span: 18 },
 };
 
- const TypeFilmDetail =({ id, onClose, openModal })=> {
-    const [form] = Form.useForm();
+const TypeFilmDetail = ({ id, onClose, openModal }) => {
+  const [form] = Form.useForm();
+  const dispatch = useDispatch();
 
-    const closeModal = () => {
-        if (typeof openModal === "function") {
-          openModal(onClose);
-        }
-      };
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [keycode, setKeycode] = useState("");
 
-    return (
-        <div className="film_type_detail">
+  const closeModal = () => {
+    if (typeof openModal === "function") {
+      openModal(onClose);
+    }
+  };
+
+  const creatTypeFilm = () =>{
+    const params ={
+      name:name,
+      description:description,
+      keycode:keycode,
+    }
+    dispatch(TypeFilmActions.onCreate(params));
+    form.resetFields();
+  }
+
+  const updateTypeFilm = () =>{
+    const params ={
+      name:name,
+      description:description,
+      keycode:keycode,
+    }
+   if(id){  
+    dispatch(TypeFilmActions.onUpdate({id,params}));
+    form.resetFields();}
+  }
+
+  return (
+    <div className="film_type_detail">
       <Card title={!id ? "Create Type Film" : "Type Film Detail & Update"}>
-        <Form form={form} {...layout}>
+        <Form form={form} {...layout} layout="vertical">
           <Form.Item
             label="Name"
             name="name"
@@ -45,7 +72,7 @@ const tailLayout = {
               },
             ]}
           >
-            <Input />
+            <Input onChange={(e) => setName(e.target.value)} />
           </Form.Item>
           <Form.Item
             label="Discription"
@@ -57,52 +84,34 @@ const tailLayout = {
               },
             ]}
           >
-            <Input />
+            <Input onChange={(e) => setDescription(e.target.value)}/>
           </Form.Item>
           <Form.Item
             label="Key Code"
             name="keycode"
             rules={[
               {
-                required: false,
+                required: true,
                 message: "Please input Key Code",
               },
             ]}
           >
-            <Input />
+            <Input onChange={(e) => setKeycode(e.target.value)}/>
           </Form.Item>
 
-          <Form.Item
-            label="Films"
-            name="films"
-            rules={[
-              {
-                required: true,
-                message: "Please choose films",
-              },
-            ]}
-          >
-            <Select mode="multiple">
-              <Select.Option>Iron Man</Select.Option>
-              <Select.Option>Superman</Select.Option>
-              <Select.Option>Kẻ Hủy Diệt</Select.Option>
-              <Select.Option>Mắt Biếc</Select.Option>
-            </Select>
+          <Form.Item {...tailLayout}>
+            <>
+              <Button type="danger" onClick={closeModal}>
+                Close
+              </Button>
+              <Button type="default" onClick={creatTypeFilm}>Create</Button>
+              <Button type="primary" onClick={updateTypeFilm}>Update</Button>
+            </>
           </Form.Item>
         </Form>
-
-        <Form.Item {...tailLayout}>
-          <>
-            <Button type="danger" onClick={closeModal}>
-              Close
-            </Button>
-            <Button type="default">Create</Button>
-            <Button type="primary">Update</Button>
-          </>
-        </Form.Item>
       </Card>
     </div>
-    )
-}
- 
+  );
+};
+
 export default TypeFilmDetail;

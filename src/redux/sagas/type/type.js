@@ -33,20 +33,17 @@ function* handleGetList({ payload }) {
   }
 
   // Create
-  function* handleCreate({ payload ,callback}) {
+  function* handleCreate({ payload }) {
     try {
       const result = yield call(TypeApi.Type.create, payload);
       const data = get(result, "data");
       if (get(result, "status") !== 201) throw data;
-      message.success("Create Type Film success!");
-      if (callback) {
-        callback();
-      }
+      message.success("Create Type Film success!")
       yield put(TypeFilmActions.onCreateSuccess(data));
       yield put(TypeFilmActions.onGetList());
     } catch (error) {
       console.log(error);
-      message.error(get(error, "msg", "Error when create Type Film!"));
+      message.error(get(error, "msg", "Error when create Type Film!"+ error));
       yield put(TypeFilmActions.onCreateError(error));
     }
   }

@@ -11,6 +11,9 @@ import Dashboard from "./../Dashboard";
 import TypeFilm from "../TypeFilm/TypeFilmPage";
 import UserPage from "../User/UserPage";
 import Login from "../../routes/Auth/login";
+import PageNotFound from "../../routes/PageNotFound/PageNodeFound";
+import "./style.css";
+import "../../index.css";
 
 class Home extends Component {
   constructor(props) {
@@ -20,7 +23,7 @@ class Home extends Component {
         {
           path: "/",
           exact: true,
-          component: <Dashboard />,
+          component: <Dashboard/>,
         },
         {
           path: "/film",
@@ -42,6 +45,11 @@ class Home extends Component {
           exact: true,
           component: <Login />,
         },
+        {
+          path: "*",
+          exact: false,
+          component: <PageNotFound />,
+        },
       ],
     };
   }
@@ -50,6 +58,40 @@ class Home extends Component {
     const { router } = this.state;
     return (
       <Router>
+      <div className="header container-fluid">
+          <div className="row">
+            <div className="col-6 hd_menu_left">
+              <ul>
+                <li>
+                  <Link to="/">Dashboard</Link>
+                </li>
+                <li>
+                  <Link to="/user">User Management</Link>
+                </li>
+                <li>
+                  <Link to="/film">Film Management</Link>
+                </li>
+                <li>
+                  <Link to="/type-film">Type of Film</Link>
+                </li>
+              </ul>
+            </div>
+            {/* <div className="col-6 hd_menu_right">
+              <ul>
+                <li>
+                  <Link to="/login">Login</Link>
+                </li>
+                <li>
+                  <Link to="/signup">Signup</Link>
+                </li>
+                <li>
+                  <Link to="/logout">Logout</Link>
+                </li>
+                <li>@#$%^&</li>
+              </ul>
+            </div> */}
+          </div>
+        </div>
         <Switch>
           {router.map((route, index) => (
             // Render more <Route>s with the same paths as
@@ -59,6 +101,7 @@ class Home extends Component {
             </Route>
           ))}
         </Switch>
+        {/* </div> */}
       </Router>
     );
   }

@@ -1,5 +1,5 @@
 import { get, omit, cloneDeep } from "lodash";
-import { UserActionTypes } from "../../actions/user/user";
+import { TypeFilmActionTypes } from "../../actions/type/typefilm";
 
 const init = {
   loading: true,
@@ -28,83 +28,83 @@ const init = {
 
 export default function (state = init, action) {
   switch (action.type) {
-    case UserActionTypes.CLEAR_DETAIL:
+    case TypeFilmActionTypes.CLEAR_DETAIL:
       return {
         ...state,
         detail: null,
         loadingDetail: true,
       };
 
-    case UserActionTypes.CLEAR_STATE:
+    case TypeFilmActionTypes.CLEAR_STATE:
       return {
         ...init,
       };
 
-    case UserActionTypes.GET_LIST:
+    case TypeFilmActionTypes.GET_LIST:
       return {
         ...state,
         loading: true,
       };
 
-    case UserActionTypes.GET_LIST_ERROR:
+    case TypeFilmActionTypes.GET_LIST_ERROR:
       return {
         ...state,
         loading: false,
         apiResultGetList: omit(get(action, "payload"), ["data"]),
       };
 
-    case UserActionTypes.GET_LIST_SUCCESS:
+    case TypeFilmActionTypes.GET_LIST_SUCCESS:
       return {
         ...state,
         loading: false,
-        listUser: get(action, "payload", []),
+        listTypeFilm: get(action, "payload", []),
         apiResultGetList: omit(get(action, "payload"), ["data"]),
       };
 
-    case UserActionTypes.GET_DETAIL:
+    case TypeFilmActionTypes.GET_DETAIL:
       return {
         ...state,
         loadingDetail: true,
         detail: null,
       };
 
-    case UserActionTypes.GET_DETAIL_SUCCESS:
+    case TypeFilmActionTypes.GET_DETAIL_SUCCESS:
       return {
         ...state,
         loadingDetail: false,
         detail: action.payload,
       };
 
-    case UserActionTypes.GET_DETAIL_ERROR:
+    case TypeFilmActionTypes.GET_DETAIL_ERROR:
       return {
         ...state,
         loadingDetail: false,
         detail: action.payload,
       };
 
-    case UserActionTypes.CREATE:
-    case UserActionTypes.UPDATE:
-    case UserActionTypes.DELETE:
+    case TypeFilmActionTypes.CREATE:
+    case TypeFilmActionTypes.UPDATE:
+    case TypeFilmActionTypes.DELETE:
       return {
         ...state,
         processing: true,
       };
 
-    case UserActionTypes.CREATE_ERROR:
-    case UserActionTypes.UPDATE_ERROR:
-    case UserActionTypes.DELETE_ERROR:
+    case TypeFilmActionTypes.CREATE_ERROR:
+    case TypeFilmActionTypes.UPDATE_ERROR:
+    case TypeFilmActionTypes.DELETE_ERROR:
       return {
         ...state,
         processing: false,
       };
-    case UserActionTypes.UPDATE_SUCCESS:
+    case TypeFilmActionTypes.UPDATE_SUCCESS:
       return {
         ...state,
         processing: false,
       };
 
-    case UserActionTypes.CREATE_SUCCESS:
-    case UserActionTypes.DELETE_SUCCESS:
+    case TypeFilmActionTypes.CREATE_SUCCESS:
+    case TypeFilmActionTypes.DELETE_SUCCESS:
       return {
         ...state,
         processing: false,
