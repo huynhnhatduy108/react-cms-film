@@ -17,6 +17,7 @@ import FilmActions from "../../redux/actions/film/film";
 import FilmSelectors from "../../redux/selectors/film/film";
 import TypeFilmSelectors from "../../redux/selectors/type/type";
 import { parse } from "query-string";
+const { TextArea } = Input;
 
 const layout = {
   labelCol: { offset: 2, span: 10 },
@@ -30,12 +31,10 @@ const FilmDetail = ({ id, onClose, openModal }) => {
   const dispatch = useDispatch();
 
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
-  const [hidden, setHidden] = useState(false);
 
-  const [name, setName] = useState("");
+  const [name, setName] = useState();
   const [image, setImage] = useState(null);
-  const [description, setDescription] = useState("");
+  const [description, setDescription] = useState();
   const [price, setPrice] = useState();
   const [types,setTypes] = useState();
 
@@ -92,14 +91,14 @@ const FilmDetail = ({ id, onClose, openModal }) => {
 
   return (
     <div className="film_detail">
-      <Card title={!hidden ? "Create Film" : "Film Detail & Update"}>
+      <Card title={!id ? "Create Film" : "Film Detail & Update"}>
         <Form
           form={form}
           {...layout}
           layout="vertical"
-          initialValues={{
+          initialValues={id?{
            ...filmDetail,
-          }}
+          }:{}}
         >
           <Form.Item
             label="Name"
@@ -123,7 +122,7 @@ const FilmDetail = ({ id, onClose, openModal }) => {
               },
             ]}
           >
-            <Input onChange={(e) => setDescription(e.target.value)} />
+            <TextArea rows={4} onChange={(e) => setDescription(e.target.value)} />
           </Form.Item>
           <Form.Item
             label="Price"
@@ -153,6 +152,7 @@ const FilmDetail = ({ id, onClose, openModal }) => {
           >
             <Select
             mode="multiple"
+            showArrow
             style={{ width: "100%" }}
             placeholder="Choose Type Film"
             onChange ={e=>{setTypes(e)}}
@@ -194,10 +194,10 @@ const FilmDetail = ({ id, onClose, openModal }) => {
             <Button type="danger" onClick={closeModal}>
               Close
             </Button>
-            <Button type="primary" hidden={false} onClick={creatFilm}>
+            <Button type="primary" hidden={id? true:false} onClick={creatFilm}>
               Create
             </Button>
-            <Button type="default" hidden={false} onClick={updateFilm}>
+            <Button type="default" hidden={!id? true:false} onClick={updateFilm}>
               Update
             </Button>
           </>

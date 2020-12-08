@@ -46,8 +46,8 @@ class TypeFilm extends Component {
   _onUpdate = (id) => {
     this.setState({
       openModal: true,
+      id:id,
     });
-    console.log("Update_id", id);
   };
 
   _handleDelete = (e, id) => {

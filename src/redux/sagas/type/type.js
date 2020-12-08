@@ -72,7 +72,7 @@ function* handleGetList({ payload }) {
       const result = yield call(TypeApi.Type.delete, id);
       const data = get(result, "data", {});
       if (get(result, "status") !== 200) throw data;
-      message.success("Delete Film Success!");
+      message.success("Delete Type Film Success!");
       if (callback) {callback();};
       yield put(TypeFilmActions.onDeleteSuccess(data));
       yield put(TypeFilmActions.onGetList());

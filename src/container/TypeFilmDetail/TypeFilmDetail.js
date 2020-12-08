@@ -11,9 +11,11 @@ import {
 import { get, omit } from "lodash";
 import { useDispatch, useSelector } from "react-redux";
 import TypeFilmActions from "../../redux/actions/type/typefilm";
-import TypeFilmSelectors from "../../redux/selectors/film/film";
+import TypeFilmSelectors from "../../redux/selectors/type/type";
 import FilmSelectors from "../../redux/selectors/film/film";
 import { parse } from "query-string";
+
+const {TextArea} =Input;
 
 const layout = {
   labelCol: { offset: 2, span: 10 },
@@ -30,6 +32,21 @@ const TypeFilmDetail = ({ id, onClose, openModal }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [keycode, setKeycode] = useState("");
+  const detail = useSelector(TypeFilmSelectors.getDetail);
+  const typeDetail = get(detail, "type");
+  console.log("idtypefilm", id);
+  console.log("description", description);
+
+
+  useEffect(() => {
+    if (id) {
+      dispatch(TypeFilmActions.onGetDetail(id));
+    }
+    return () => {
+      form.resetFields();
+    };
+  }, [id]);
+ 
 
   const closeModal = () => {
     if (typeof openModal === "function") {
@@ -61,7 +78,12 @@ const TypeFilmDetail = ({ id, onClose, openModal }) => {
   return (
     <div className="film_type_detail">
       <Card title={!id ? "Create Type Film" : "Type Film Detail & Update"}>
-        <Form form={form} {...layout} layout="vertical">
+        <Form form={form} {...layout} 
+        layout="vertical"
+        initialValues={id ? {
+          ...typeDetail,
+         }:{}}
+        >
           <Form.Item
             label="Name"
             name="name"
@@ -75,16 +97,16 @@ const TypeFilmDetail = ({ id, onClose, openModal }) => {
             <Input onChange={(e) => setName(e.target.value)} />
           </Form.Item>
           <Form.Item
-            label="Discription"
-            name="discription"
+            label="Description"
+            name="description"
             rules={[
               {
                 required: true,
-                message: "Please input Discription",
+                message: "Please input Description",
               },
             ]}
           >
-            <Input onChange={(e) => setDescription(e.target.value)}/>
+            <TextArea rows={4} onChange={(e) => setDescription(e.target.value)}/>
           </Form.Item>
           <Form.Item
             label="Key Code"
@@ -104,8 +126,8 @@ const TypeFilmDetail = ({ id, onClose, openModal }) => {
               <Button type="danger" onClick={closeModal}>
                 Close
               </Button>
-              <Button type="default" onClick={creatTypeFilm}>Create</Button>
-              <Button type="primary" onClick={updateTypeFilm}>Update</Button>
+              <Button type="default" hidden={id? true:false} onClick={creatTypeFilm}>Create</Button>
+              <Button type="primary" hidden={!id? true:false} onClick={updateTypeFilm}>Update</Button>
             </>
           </Form.Item>
         </Form>

@@ -18,12 +18,12 @@ const UserDetail = ({ id, onClose, openModal }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
 
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [email, setEmail] = useState("");
-  const [userName, setUserName] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
+  const [name, setName] = useState();
+  const [description, setDescription] = useState();
+  const [email, setEmail] = useState();
+  const [userName, setUserName] = useState();
+  const [password, setPassword] = useState();
+  const [role, setRole] = useState();
 
   useEffect(() => {
     if (id) {
@@ -77,9 +77,9 @@ const UserDetail = ({ id, onClose, openModal }) => {
         <Form
           form={form}
           {...layout}
-          initialValues={{
+          initialValues={id?{
             ...userDetail,
-          }}
+          }:{}}
           layout="vertical"
         >
           <Form.Item
@@ -166,10 +166,10 @@ const UserDetail = ({ id, onClose, openModal }) => {
               <Button type="danger" onClick={closeModal}>
                 Close
               </Button>
-              <Button type="default" onClick={creatFilm}>
+              <Button type="default" hidden={id? true:false} onClick={creatFilm}>
                 Create
               </Button>
-              <Button type="primary" onClick={updateFilm}>
+              <Button type="primary" hidden={!id? true:false} onClick={updateFilm}>
                 Update
               </Button>
             </>
