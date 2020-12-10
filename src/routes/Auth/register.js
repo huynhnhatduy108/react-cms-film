@@ -6,18 +6,7 @@ import {
   Route,
   Redirect,
 } from "react-router-dom";
-import {
-  Button,
-  Result,
-  Skeleton,
-  Spin,
-  Card,
-  Form,
-  Input,
-  Select,
-  Tag,
-  Table,
-} from "antd";
+import { Button, Card, Form, Input } from "antd";
 import AuthSelectors from "../../redux/selectors/auth/auth";
 import AuthActions from "../../redux/actions/auth/auth";
 
@@ -26,43 +15,72 @@ const layout = {
   wrapperCol: { span: 16 },
 };
 
-class login extends Component {
+class register extends Component {
   constructor(props) {
     super(props);
     this.state = {
       username: "",
       password: "",
+      email: "",
+      name: "",
     };
   }
 
-  handleLogin = (e) => {
-    e.preventDefault();
-    const { username, password } = this.state;
+  handleLogin = () => {};
+  hanleRegister = () => {
+    const { username, password, email, name } = this.state;
     const params = {
       username,
       password,
+      email,
+      name,
     };
-    this.props.onLogin(params);
-  };
-  hanleRegister = () => {
-    return (
-        <Redirect to="/register" />
-    );
+    console.log(params);
+    this.props.onRegister(params);
   };
 
   render() {
-    const {AuthState:{loading},user,apiResult} =this.props;
-    console.log("user", user);
-    if(user && user.token){
-      localStorage.setItem("token", user.token);
-    }
+    // const {username, email, password} = this.state;
+    // console.log("",username,"",email,"",password);
 
     return (
-      <div className="row login" style={{ marginTop: 100 }}>
+      <div className="row register" style={{ marginTop: 100 }}>
         <div className="col-3"></div>
         <div className="col-6">
-          <Card title={"Login"}>
+          <Card title={"Register"}>
             <Form {...layout}>
+              <Form.Item
+                label="Full Name"
+                name="name"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input Name",
+                  },
+                ]}
+              >
+                <Input
+                  onChange={(e) => {
+                    this.setState({ name: e.target.value });
+                  }}
+                />
+              </Form.Item>
+              <Form.Item
+                label="Username"
+                name="username"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input username",
+                  },
+                ]}
+              >
+                <Input
+                  onChange={(e) => {
+                    this.setState({ username: e.target.value });
+                  }}
+                />
+              </Form.Item>
               <Form.Item
                 label="Email"
                 name="email"
@@ -75,7 +93,7 @@ class login extends Component {
               >
                 <Input
                   onChange={(e) => {
-                    this.setState({ username: e.target.value });
+                    this.setState({ email: e.target.value });
                   }}
                 />
               </Form.Item>
@@ -97,15 +115,15 @@ class login extends Component {
               </Form.Item>
               <Form.Item>
                 <>
-                  <Button type="primary" onClick={this.handleLogin}>
-                    Login
+                  <Button type="primary" onClick={this.hanleRegister}>
+                    Register
                   </Button>
                   <Button
                     type=""
                     style={{ marginLeft: 10 }}
-                    onClick={this.hanleRegister}
+                    onClick={this.handleLogin}
                   >
-                    Register
+                    Login
                   </Button>
                 </>
               </Form.Item>
@@ -120,14 +138,14 @@ class login extends Component {
 const mapStateToProps = (state) => {
   return {
     AuthState: AuthSelectors.getState(state),
-    user: AuthSelectors.getUser(state),
+    // user: AuthSelectors.getUser(state),
     apiResult: AuthSelectors.apiResult(state),
   };
 };
 
 const mapDispatchToProps = {
-  onLogin: AuthActions.onLogin,
+  onRegister: AuthActions.onRegister,
   onClearState: AuthActions.onClearState,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(login);
+export default connect(mapStateToProps, mapDispatchToProps)(register);

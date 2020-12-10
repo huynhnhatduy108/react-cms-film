@@ -73,7 +73,7 @@ class TypeFilm extends Component {
   render() {
     const { onClose, openModal, id, filter } = this.state;
     const { keyword, sort } = filter;
-    const { listItems } = this.props;
+    const { typeFilmState:{loading},listItems } = this.props;
     var {types} =listItems;
     // console.log("Types",types);
 
@@ -98,6 +98,14 @@ class TypeFilm extends Component {
       types = types.filter((item) => {
         return item.name.toLowerCase().indexOf(keyword) !== -1;
       });
+    }
+
+    if (loading) {
+      return (
+        <div className="container" >
+          <Spin tip="Loading..." style={{ marginTop:200 }}></Spin>
+        </div>
+      );
     }
 
     return (
@@ -192,7 +200,7 @@ class TypeFilm extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    filmState: TypeFilmSelectors.getState(state),
+    typeFilmState: TypeFilmSelectors.getState(state),
     listItems: TypeFilmSelectors.getList(state),
     metadata: TypeFilmSelectors.getMetadata(state),
     apiResultGetList: TypeFilmSelectors.apiResultGetList(state),

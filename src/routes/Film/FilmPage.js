@@ -76,11 +76,12 @@ class FilmPage extends Component {
   }
 
   render() {
-    const { listItems, listTypeFilm } = this.props;
+    const { filmState:{loading},listItems, listTypeFilm ,isLogin } = this.props;
     const { onClose, openModal, id, filter } = this.state;
     const {types} = listTypeFilm;
     var { films } = listItems;
     const {keyword, sort} = filter;
+    console.log("isLoginFilmPage",isLogin);
 
     var data = [
       {
@@ -143,6 +144,14 @@ class FilmPage extends Component {
       films=films.filter((item)=>{
         return item.name.toLowerCase().indexOf(keyword)!== -1;
       });      
+    }
+
+    if (loading) {
+      return (
+        <div className="container" >
+          <Spin tip="Loading..." style={{ marginTop:200 }}></Spin>
+        </div>
+      );
     }
     
     return (

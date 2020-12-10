@@ -19,23 +19,23 @@ const UserDetail = ({ id, onClose, openModal }) => {
   const [form] = Form.useForm();
 
   const [name, setName] = useState();
-  const [description, setDescription] = useState();
   const [email, setEmail] = useState();
   const [userName, setUserName] = useState();
   const [password, setPassword] = useState();
   const [role, setRole] = useState();
+  const detail = useSelector(UserSelectors.getDetail);
+  const userDetail = get(detail, "user", {});
 
   useEffect(() => {
-    if (id) {
+    if ( id && id !== get(userDetail, "_id")) {
       dispatch(UserActions.onGetDetail(id));
     }
     return () => {
       form.resetFields();
     };
-  }, [id]);
-  const detail = useSelector(UserSelectors.getDetail);
-  const userDetail = get(detail, "user", {});
-  console.log("userDetail", userDetail);
+  }, [id,detail,form]);
+  
+  // console.log("userDetail", userDetail);
 
   const closeModal = () => {
     if (typeof openModal === "function") {
@@ -46,7 +46,6 @@ const UserDetail = ({ id, onClose, openModal }) => {
   const creatFilm = () => {
     const params = {
       name: name,
-      description: description,
       email: email,
       password: password,
       role: role,
@@ -59,7 +58,6 @@ const UserDetail = ({ id, onClose, openModal }) => {
   const updateFilm = () => {
     const params = {
       name: name,
-      description: description,
       email: email,
       password: password,
       role: role,
@@ -71,6 +69,11 @@ const UserDetail = ({ id, onClose, openModal }) => {
     }
   };
 
+  const onSubmit = (values) =>{
+    const newValues = { ...values };
+    console.log("newValues",newValues);
+  }
+
   return (
     <div className="user_detail">
       <Card title={!id ? "Create User" : "User Detail & Update"}>
@@ -81,6 +84,7 @@ const UserDetail = ({ id, onClose, openModal }) => {
             ...userDetail,
           }:{}}
           layout="vertical"
+          onFinish={onSubmit}
         >
           <Form.Item
             label="Name"
@@ -92,7 +96,8 @@ const UserDetail = ({ id, onClose, openModal }) => {
               },
             ]}
           >
-            <Input onChange={(e) => setName(e.target.value)} />
+            <Input 
+            onChange={(e) => setName(e.target.value)} />
           </Form.Item>
           <Form.Item
             label="User Name"
@@ -105,7 +110,6 @@ const UserDetail = ({ id, onClose, openModal }) => {
             ]}
           >
             <Input
-              disabled={id ? true : false}
               onChange={(e) => setUserName(e.target.value)}
             />
           </Form.Item>
@@ -133,7 +137,7 @@ const UserDetail = ({ id, onClose, openModal }) => {
               },
             ]}
           >
-            <Input
+            <Input.Password
               type="password"
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -149,7 +153,9 @@ const UserDetail = ({ id, onClose, openModal }) => {
               },
             ]}
           >
-            <Select onChange={(value) => setRole(value)}>
+            <Select          
+            //  value={id?get(userDetail,"role"):""}
+            onChange={(value) => setRole(value)}>
               <Select.Option key={0} value={0}>
                 USER
               </Select.Option>
@@ -172,6 +178,9 @@ const UserDetail = ({ id, onClose, openModal }) => {
               <Button type="primary" hidden={!id? true:false} onClick={updateFilm}>
                 Update
               </Button>
+              {/* <Button type="primary"  onClick={onSubmit}>
+                Submit
+              </Button> */}
             </>
           </Form.Item>
         </Form>

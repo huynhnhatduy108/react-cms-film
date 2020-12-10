@@ -34,18 +34,17 @@ const TypeFilmDetail = ({ id, onClose, openModal }) => {
   const [keycode, setKeycode] = useState("");
   const detail = useSelector(TypeFilmSelectors.getDetail);
   const typeDetail = get(detail, "type");
-  console.log("idtypefilm", id);
-  console.log("description", description);
+  console.log("typeDetail", typeDetail);
 
 
   useEffect(() => {
-    if (id) {
+    if (id && id !== get(typeDetail, "_id")) {
       dispatch(TypeFilmActions.onGetDetail(id));
     }
     return () => {
       form.resetFields();
     };
-  }, [id]);
+  }, [id,detail,form]);
  
 
   const closeModal = () => {

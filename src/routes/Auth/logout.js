@@ -1,12 +1,11 @@
-import React, { Component } from 'react'
+import React, { Component } from "react";
 
 class logout extends Component {
-    render() {
-        return (
-            <div>
-                Logout
-            </div>
-        )
-    }
+  componentDidMount() {
+    localStorage.clear();
+  }
+  render() {
+    return <div>Logout User Success !</div>;
+  }
 }
 export default logout;

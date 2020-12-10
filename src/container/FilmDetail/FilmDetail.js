@@ -44,18 +44,19 @@ const FilmDetail = ({ id, onClose, openModal }) => {
   const listTypes = get(listTypeFilm, "types");
 
   console.log("idfilm", id);
+  console.log("filmDetail", filmDetail);
+
 
   useEffect(() => {
-    if (id) {
+    if (id && id !== get(filmDetail, "_id")) {
       dispatch(FilmActions.onGetDetail(id));
     }
     return () => {
       form.resetFields();
     };
-  }, [id]);
+  }, [id,detail,form]);
 
   const closeModal = () => {
-    // form.resetFields();
     if (typeof openModal === "function") {
       openModal(onClose);
     }
@@ -82,8 +83,10 @@ const FilmDetail = ({ id, onClose, openModal }) => {
     params.append("price", price);
     if(types){ types.map(type =>{
       params.append("types",type);
-    }); }   
-    params.append("image", image);
+    }); }  
+    if(image){
+      params.append("image", image);
+    } 
     if (id) {
       dispatch(FilmActions.onUpdate({ id, params }));
     }

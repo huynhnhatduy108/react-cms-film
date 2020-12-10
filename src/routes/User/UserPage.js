@@ -1,18 +1,11 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import {
-  Button,
-  Tag,
-  Table,
-  Input,
-  Card,
-} from "antd";
+import { Button, Tag, Table, Input, Card, Spin } from "antd";
 import ConfirmDeleteButton from "../../container/ConfirmDelete";
 import UserDetail from "../../container/UserDetail/UserDetail";
 import UserSelectors from "../../redux/selectors/user/user";
 import UserActions from "../../redux/actions/user/user";
-import {userRole} from "../../constants";
-
+import { userRole } from "../../constants";
 
 class UserPage extends Component {
   constructor(props) {
@@ -21,7 +14,7 @@ class UserPage extends Component {
       openModal: false,
       onClose: false,
       id: null,
-      detail:null,
+      detail: null,
       filter: {
         keyword: "",
         sort: 0,
@@ -42,13 +35,13 @@ class UserPage extends Component {
   _onUpdate = (id) => {
     this.setState({
       openModal: true,
-      id:id
+      id: id,
     });
   };
 
   _handleDelete = (e, id) => {
     e.stopPropagation();
-    this.props.onDelete({id});
+    this.props.onDelete({ id });
   };
 
   onSearch = (e) => {
@@ -65,11 +58,13 @@ class UserPage extends Component {
   }
 
   render() {
-    const { listItems } = this.props;
+    const {
+      filmState: { loading },
+      listItems,
+    } = this.props;
     const { onClose, openModal, id, filter } = this.state;
     const { keyword, sort } = filter;
-    var {users} =listItems;
-    
+    var { users } = listItems;
 
     var data = [
       {
@@ -185,6 +180,14 @@ class UserPage extends Component {
       });
     }
 
+    if (loading) {
+      return (
+        <div className="container" >
+          <Spin tip="Loading..." style={{ marginTop:200 }}></Spin>
+        </div>
+      );
+    }
+
     return (
       <div className="container user">
         <div className="row ">
@@ -193,7 +196,7 @@ class UserPage extends Component {
               openModal={(value) => {
                 this.setState({
                   openModal: value,
-                  id:null
+                  id: null,
                 });
               }}
               onClose={onClose}
@@ -231,24 +234,24 @@ class UserPage extends Component {
                       key: "name",
                     },
                     {
-                      title: "Email",
-                      dataIndex: "email",
-                      key: "email",
-                    },
-                    {
                       title: "Username",
                       dataIndex: "username",
                       key: "username",
                     },
                     {
+                      title: "Email",
+                      dataIndex: "email",
+                      key: "email",
+                    },
+                    {
                       title: "Role",
                       key: "role",
                       dataIndex: "role",
-                      render: (role) =>{
+                      render: (role) => {
                         let tag;
-                        userRole.map(item =>{
-                          if(item.id===role) return tag = item
-                        })
+                        userRole.map((item) => {
+                          if (item.id === role) return (tag = item);
+                        });
                         return <Tag key={role}>{tag.role}</Tag>;
                       },
                     },

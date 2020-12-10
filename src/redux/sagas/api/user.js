@@ -11,8 +11,9 @@ const UserApi = {
       delete: async (id) => await api.delete(`${UserEndpoint}/${id}`),
     },
     Auth:{
-      signin: async (params) => await api.post(`${UserEndpoint}/signin`,params),
-      signup: async (params) => await api.post(`${UserEndpoint}/signup`,params),
+      register: async (params) => await api.post(`${UserEndpoint}/register`,params),
+      login: async (params) => await api.post(`${UserEndpoint}/login`,params),
+      logout: async (params) => await api.get(`${UserEndpoint}/logout`,params),
       authGoogle: async (params) => await api.post(`${UserEndpoint}/auth/google`,params),
     }
   };

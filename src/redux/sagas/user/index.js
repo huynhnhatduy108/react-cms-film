@@ -46,8 +46,8 @@ function* handleGetList({ payload }) {
       yield put(UserActions.onCreateSuccess(data));
       yield put(UserActions.onGetList());
     } catch (error) {
-      console.log(error);
-      message.error(get(error, "msg", "Error when create User!"));
+      // console.log(error);
+      message.error(get(error, "msg", "Error when create User! "+error));
       yield put(UserActions.onCreateError(error));
     }
   }
@@ -64,8 +64,8 @@ function* handleGetList({ payload }) {
       yield put(UserActions.onUpdateSuccess(data));
       yield put(UserActions.onGetList());
     } catch (error) {
-      console.log(error);
-      message.error(get(error, "msg", "Error when Update User"));
+      // console.log(error);
+      message.error(get(error, "msg", "Error when Update User " +error));
       yield put(UserActions.onUpdateError(error));
     }
   }
