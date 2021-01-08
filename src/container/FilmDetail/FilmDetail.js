@@ -78,9 +78,9 @@ const FilmDetail = ({ id, onClose, openModal }) => {
 
   const updateFilm = () => {
     const params = new FormData();
-    params.append("name", name);
-    params.append("description", description);
-    params.append("price", price);
+    if(name){params.append("name", name);}
+    if(description){params.append("description", description);}
+    if(price){params.append("price", price);}
     if(types){ types.map(type =>{
       params.append("types",type);
     }); }  

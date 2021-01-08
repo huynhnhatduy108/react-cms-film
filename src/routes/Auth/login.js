@@ -8,15 +8,9 @@ import {
 } from "react-router-dom";
 import {
   Button,
-  Result,
-  Skeleton,
-  Spin,
   Card,
   Form,
   Input,
-  Select,
-  Tag,
-  Table,
 } from "antd";
 import AuthSelectors from "../../redux/selectors/auth/auth";
 import AuthActions from "../../redux/actions/auth/auth";
@@ -44,6 +38,7 @@ class login extends Component {
     };
     this.props.onLogin(params);
   };
+
   hanleRegister = () => {
     return (
         <Redirect to="/register" />
@@ -51,10 +46,10 @@ class login extends Component {
   };
 
   render() {
-    const {AuthState:{loading},user,apiResult} =this.props;
-    console.log("user", user);
+    const {AuthState:{loading}, user, apiResult} =this.props;
+
     if(user && user.token){
-      localStorage.setItem("token", user.token);
+      localStorage.setItem("user", user);
     }
 
     return (
@@ -64,12 +59,12 @@ class login extends Component {
           <Card title={"Login"}>
             <Form {...layout}>
               <Form.Item
-                label="Email"
-                name="email"
+                label="User name"
+                name="username"
                 rules={[
                   {
                     required: true,
-                    message: "Please input Email",
+                    message: "Please input username",
                   },
                 ]}
               >

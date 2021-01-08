@@ -76,12 +76,11 @@ class FilmPage extends Component {
   }
 
   render() {
-    const { filmState:{loading},listItems, listTypeFilm ,isLogin } = this.props;
+    const { filmState:{loading},listItems, listTypeFilm } = this.props;
     const { onClose, openModal, id, filter } = this.state;
     const {types} = listTypeFilm;
     var { films } = listItems;
     const {keyword, sort} = filter;
-    console.log("isLoginFilmPage",isLogin);
 
     var data = [
       {

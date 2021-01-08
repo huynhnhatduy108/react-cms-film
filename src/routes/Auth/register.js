@@ -5,6 +5,7 @@ import {
   Switch,
   Route,
   Redirect,
+  useHistory,
 } from "react-router-dom";
 import { Button, Card, Form, Input } from "antd";
 import AuthSelectors from "../../redux/selectors/auth/auth";
@@ -26,7 +27,9 @@ class register extends Component {
     };
   }
 
-  handleLogin = () => {};
+  handleLogin = () => {
+
+  };
   hanleRegister = () => {
     const { username, password, email, name } = this.state;
     const params = {

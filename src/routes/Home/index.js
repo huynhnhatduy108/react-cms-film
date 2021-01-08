@@ -1,9 +1,12 @@
-import React, { Component } from "react";
+import React, { useContext, useEffect, useState, createContext } from "react";
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Link,
+  Redirect,
+  useHistory,
+  useLocation,
   useRouteMatch,
 } from "react-router-dom";
 import Film from "./../Film/FilmPage";
@@ -18,110 +21,193 @@ import PageNotFound from "../../routes/PageNotFound/PageNodeFound";
 import "./style.css";
 import "../../index.css";
 
-class Home extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isLogin: false,
-      router: [
-        {
-          path: "/",
-          exact: true,
-          component: <Dashboard />,
-        },
-        {
-          path: "/film",
-          exact: false,
-          component: <Film isLogin={this.props.isLogin}/>,
-        },
-        {
-          path: "/user",
-          exact: false,
-          component: <UserPage isLogin={this.props.isLogin}/>,
-        },
-        {
-          path: "/type-film",
-          exact: false,
-          component: <TypeFilm isLogin={this.props.isLogin}/>,
-        },
-        {
-          path: "/login",
-          exact: true,
-          component: <Login />,
-        },
-        {
-          path: "/register",
-          exact: true,
-          component: <Register />,
-        },
-        {
-          path: "/logout",
-          exact: true,
-          component: <Logout />,
-        },
-        {
-          path: "*",
-          exact: false,
-          component: <PageNotFound />,
-        },
-      ],
-    };
-  }
+export default function Home() {
+  //   const [isLogin, setIsLogin] = useState();
+  //   var username = null;
+  //   console.log("isLoginApp",isLogin);
 
-  
+  //   useEffect(() => {
+  //     checkLogin();
+  //   }, [isLogin]);
 
-  render() {
-    const { router, isLogin } = this.state;
-    console.log("isLoginHome",isLogin);
-    return (
-      <Router>
-        <div className="header container-fluid">
-          <div className="row">
-            <div className="col-6 hd_menu_left">
-              <ul>
-                <li>
-                  <Link to="/">Dashboard</Link>
-                </li>
-                <li>
-                  <Link to="/user">User Management</Link>
-                </li>
-                <li>
-                  <Link to="/film">Film Management</Link>
-                </li>
-                <li>
-                  <Link to="/type-film">Type of Film</Link>
-                </li>
-              </ul>
-            </div>
-            <div className="col-6 hd_menu_right">
-              <ul>
-                <li style={{ display: isLogin ? "block" : "none" }}>
-                  <Link to="/login">Login</Link>
-                </li>
-                <li>
-                  <Link to="/register">Register</Link>
-                </li>
-                <li style={{ display: !isLogin ? "block" : "none" }}>username</li>
-                <li>
-                  <Link to="/logout">Logout</Link>
-                </li>
-              </ul>
+  //   const checkLogin = () => {
+  //     const result = localStorage.getItem("user");
+  //     console.log("result",typeof result);
+  //     if(result!==null){
+  //       setIsLogin(true);
+  //       username = result.username;
+  //     }else{
+  //       setIsLogin(false);
+  //     }
+  //  };
+
+  return (
+    <div className="App">
+      <ProvideAuth>
+        <Router>
+          <div className="header container-fluid">
+            <div className="row">
+              <div className="col-6 hd_menu_left">
+                <ul>
+                  <li>
+                    <Link to="/">Dashboard</Link>
+                  </li>
+                  <li>
+                    <Link to="/user">User Management</Link>
+                  </li>
+                  <li>
+                    <Link to="/film">Film Management</Link>
+                  </li>
+                  <li>
+                    <Link to="/type-film">Type of Film</Link>
+                  </li>
+                </ul>
+              </div>
+              <div className="col-6 hd_menu_right">
+                <AuthButton />
+              </div>
             </div>
           </div>
-        </div>
-        <Switch>
-          {router.map((route, index) => (
-            // Render more <Route>s with the same paths as
-            // above, but different components this time.
-            <Route key={index} path={route.path} exact={route.exact}>
-              {route.component}
+          <Switch>
+            <Route path="/public">
+              <Dashboard />
             </Route>
-          ))}
-        </Switch>
-        {/* </div> */}
-      </Router>
-    );
-  }
+            <Route path="/login">
+              <LoginPage />
+            </Route>
+            <Route path="/register">
+              <Register />
+            </Route>
+            <PrivateRoute path="/user">
+              <UserPage />
+            </PrivateRoute>
+            <PrivateRoute path="/film">
+              <Film />
+            </PrivateRoute>
+            <PrivateRoute path="/type-film">
+              <TypeFilm />
+            </PrivateRoute>
+          </Switch>
+        </Router>
+      </ProvideAuth>
+    </div>
+  );
 }
 
-export default Home;
+const fakeAuth = {
+  isAuthenticated: false,
+  signin(cb) {
+    fakeAuth.isAuthenticated = true;
+    setTimeout(cb, 100); // fake async
+  },
+  signout(cb) {
+    fakeAuth.isAuthenticated = false;
+    setTimeout(cb, 100);
+  },
+};
+
+const authContext = createContext();
+
+function ProvideAuth({ children }) {
+  const auth = useProvideAuth();
+  return <authContext.Provider value={auth}>{children}</authContext.Provider>;
+}
+
+function useAuth() {
+  return useContext(authContext);
+}
+
+function useProvideAuth() {
+  const [user, setUser] = useState(null);
+
+  const signin = (cb) => {
+    return fakeAuth.signin(() => {
+      setUser("user");
+      cb();
+    });
+  };
+
+  const signout = (cb) => {
+    return fakeAuth.signout(() => {
+      setUser(null);
+      cb();
+    });
+  };
+
+  return {
+    user,
+    signin,
+    signout,
+  };
+}
+
+function AuthButton() {
+  let history = useHistory();
+  let auth = useAuth();
+
+  return auth.user ? (
+    <ul>
+      Welcome!{" "}
+      <li
+        onClick={() => {
+          auth.signout(() => history.push("/"));
+        }}
+      >
+        <a>Logout</a>
+      </li>
+    </ul>
+  ) : (
+    <ul>
+      <li
+        onClick={() => {
+          console.log("history",history);
+          history.push("/register");
+        }}
+      >
+        <a>Register</a>
+      </li>
+    </ul>
+  );
+}
+
+function PrivateRoute({ children, ...rest }) {
+  let auth = useAuth();
+  return (
+    <Route
+      {...rest}
+      render={({ location }) =>
+        auth.user ? (
+          children
+        ) : (
+          <Redirect
+            to={{
+              pathname: "/login",
+              state: { from: location },
+            }}
+          />
+        )
+      }
+    />
+  );
+}
+
+function LoginPage() {
+  let history = useHistory();
+  let location = useLocation();
+  let auth = useAuth();
+
+  let { from } = location.state || { from: { pathname: "/" } };
+  console.log("from", from);
+  let login = () => {
+    auth.signin(() => {
+      history.replace(from);
+    });
+  };
+
+  return (
+    <div>
+      <h1>You must log in to view the page at {from.pathname}</h1>
+      <button onClick={login}>Log in</button>
+    </div>
+  );
+}
