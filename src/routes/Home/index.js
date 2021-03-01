@@ -40,6 +40,21 @@ export default function Home() {
   //       setIsLogin(false);
   //     }
   //  };
+  
+  const menuLink = ({label, to, activeOnlyWhenExact, match }) =>{
+    var active = match ? "active":"";
+    // let match = useRouteMatch({
+    //   path: to,
+    //   exact: activeOnlyWhenExact
+    // });
+  
+    return (
+      <div className={match ? "active" : ""}>
+        {match && "> "}
+        <Link to={to}>{label}</Link>
+      </div>
+    );
+  };
 
   return (
     <div className="App">
@@ -164,7 +179,7 @@ function AuthButton() {
           history.push("/register");
         }}
       >
-        <a>Register</a>
+        {/* <a>Register</a> */}
       </li>
     </ul>
   );
